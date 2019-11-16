@@ -20,6 +20,10 @@ suppressPackageStartupMessages({
   library(monocle3)
 })
 
+setwd(paste0(path_to_github,
+             "large_screen",
+             sep = ""))
+
 ## User defined function
 append_umap_coordinates = function(cds){
   num_dim = dim(cds@reducedDims[["UMAP"]])[2]

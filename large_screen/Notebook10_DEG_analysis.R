@@ -46,8 +46,6 @@ options(DelayedArray.block.size = 1000e7)
 DelayedArray:::set_verbose_block_processing(TRUE)
 options(DelayedArray.block.size = 1000e7)
 
-# User defined functions
-
 setwd(paste0(path_to_github,
              "large_screen",
              sep = ""))

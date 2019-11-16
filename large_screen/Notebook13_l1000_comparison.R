@@ -51,6 +51,9 @@ suppressPackageStartupMessages({
 DelayedArray:::set_verbose_block_processing(TRUE)
 options(DelayedArray.block.size = 1000e7)
 
+setwd(paste0(path_to_github,
+             "large_screen",
+             sep = ""))
 
 compute_effect_matrix = function(test_res) {
   dose_terms =

@@ -209,7 +209,6 @@ test_drug_dependence_model <-
     cds_subset = cds_subset[base::union(genes_in_reference_set, genes_in_treated_set), ]
     
     # At this point the cds_subset consists of the vehicle cells and the genes in each detected subset
-    
     all_treatments = pData(cds_subset) %>%
       as.data.frame() %>%
       filter(!vehicle) %>%

@@ -43,6 +43,11 @@ suppressPackageStartupMessages({
                 sep = ""))
 })
 
+setwd(paste0(path_to_github,
+             "large_screen",
+             sep = ""))
+
+
 # Load previously computed DEG results
 A549_diff_test = read.table("Supplementary_Table_5_A549.txt",
                             header = T)
