@@ -1,0 +1,11 @@
+#!/net/trapnell/vol1/ajh24/bin/trapnell_tools_development/sciatac_pipeline/src/pypy_env/bin/pypy
+
+# -*- coding: utf-8 -*-
+import re
+import sys
+
+from wheel.tool import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())
