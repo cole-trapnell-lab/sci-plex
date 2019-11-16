@@ -34,8 +34,6 @@ DATAMASH_PATH=
 
 SCRIPTS_DIR=$PATH_TO_GIT_REPO/process_from_raw/sci-RNA-seq-pipeline-scripts
 
-SANJAY_SCRIPTS_DIR=/net/trapnell/vol1/home/sanjays/projects/Chem/bin
-
 # Hash sample Sheets can be found associated with each experiment
 HASH_BARCODES_FILE=$WORKING_DIR/hashSampleSheet.txt
 
@@ -57,10 +55,11 @@ HASH_BARCODES_FILE=$WORKING_DIR/hashSampleSheet.txt
 # that are used to assign aligned reads to genes.
 
 # Used for the Barnyard Experiemnt in figure 1 
-# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/human-and-mouse/
+# GENE_MODEL_DIR that contains both human and mouse gene models
+# GENE_MODEL_DIR=gene-models/human-and-mouse/
 
 # Used as the gene moedel of all other data
-GENE_MODEL_DIR=$PATH_TO_GIT_REPO/process_from_raw/gene-models/human/
+GENE_MODEL_DIR=
 
 
 # RT_BARCODES_FILE is a two column tab-delimited file where
@@ -78,13 +77,12 @@ GENE_MODEL_DIR=$PATH_TO_GIT_REPO/process_from_raw/gene-models/human/
 # ACGTACGTAC   ACGTACGTAC
 # CGTACGTACG   CGTACGTACG
 #
-# The default RT_BARCODE_FILE is the set of 96 RT barcodes that we ordered for the Trapnell lab.
-#
-# You can also use this file that has the set of 1836 RT barcodes (!!!) that Jun uses.
-# RT_BARCODES_FILE=/net/trapnell/vol1/home/sanjays/projects/Chem/bin/RT_indices_all
-#
 
 
+
+
+# You can also use this file that has the set of 1836 RT barcodes 
+#
 # 2 level sci-RNA-seq RT barcodes
 RT_BARCODES_FILE=$SCRIPTS_DIR/RT_indices_all
 
@@ -134,7 +132,7 @@ mkdir put-r1-info-in-r2-logs
 ls fastq/ | grep _R1_ | grep -v Undetermined | split -l $BATCH_SIZE -d - file-lists-for-r1-info-munging/
 
 ls file-lists-for-r1-info-munging | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/put-read1-info-in-read2.sh \
+    qsub $SCRIPTS_DIR/put-read1-info-in-read2.sh \
         $WORKING_DIR/fastq                                      \
         $WORKING_DIR/file-lists-for-r1-info-munging/$BATCH      \
         $SCRIPTS_DIR/                                           \
@@ -160,7 +158,7 @@ done
 # ls fastq/ | grep _R1_ | grep -v Undetermined | split -l $BATCH_SIZE -d - file-lists-for-r1-info-munging/
 #   
 # ls file-lists-for-r1-info-munging | while read BATCH; do
-#   qsub -P trapnelllab $SCRIPTS_DIR/put-read1-info-in-read2_3Level.sh \
+#   qsub $SCRIPTS_DIR/put-read1-info-in-read2_3Level.sh \
 #       $WORKING_DIR/fastq                                      \
 #       $WORKING_DIR/file-lists-for-r1-info-munging/$BATCH      \
 #       $SCRIPTS_DIR/                                           \
@@ -184,7 +182,7 @@ mkdir hashed-logs
 ls combined-fastq/ | split -l $BATCH_SIZE -d - file-lists-for-trimming/
 
 ls file-lists-for-r1-info-munging | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/parse_hash.sh \
+    qsub $SCRIPTS_DIR/parse_hash.sh \
         $WORKING_DIR/combined-fastq                             \
         $WORKING_DIR/file-lists-for-trimming/$BATCH             \
         $SCRIPTS_DIR/                                           \
@@ -244,7 +242,7 @@ mkdir trimmed-fastq
 ls combined-fastq/ | split -l $BATCH_SIZE -d - file-lists-for-trimming/
 
 ls file-lists-for-trimming | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/run-trim-galore.sh     \
+    qsub $SCRIPTS_DIR/run-trim-galore.sh     \
         $WORKING_DIR/combined-fastq                         \
         $WORKING_DIR/file-lists-for-trimming/$BATCH         \
         $WORKING_DIR/trimmed-fastq
@@ -260,7 +258,7 @@ cd $WORKING_DIR
 
 mkdir aligned-reads
 
-qsub -P trapnelllab $SCRIPTS_DIR/STAR-alignReads-moreMem.sh \
+qsub $SCRIPTS_DIR/STAR-alignReads-moreMem.sh \
     $WORKING_DIR/trimmed-fastq                              \
     $STAR_INDEX                                             \
     $WORKING_DIR/aligned-reads
@@ -279,7 +277,7 @@ mkdir rRNA-read-counts
 ls aligned-reads/ | grep "[.]Aligned[.]out[.]bam$" | split -l $BATCH_SIZE -d - file-lists-for-samtools-sort/
 
 ls file-lists-for-samtools-sort | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/samtools-filter-sort.sh    \
+    qsub $SCRIPTS_DIR/samtools-filter-sort.sh    \
         $WORKING_DIR/aligned-reads                              \
         $WORKING_DIR/file-lists-for-samtools-sort/$BATCH        \
         $WORKING_DIR/aligned-reads-filtered-sorted
@@ -290,7 +288,7 @@ done
 #
 
 ls file-lists-for-samtools-sort | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/count-rRNA-reads.sh        \
+    qsub $SCRIPTS_DIR/count-rRNA-reads.sh        \
         $WORKING_DIR/aligned-reads                              \
         $WORKING_DIR/file-lists-for-samtools-sort/$BATCH        \
         $GENE_MODEL_DIR/latest.rRNA.gene.regions.union.bed      \
@@ -309,7 +307,7 @@ mkdir aligned-reads-rmdup-split-bed
 ls aligned-reads-filtered-sorted/ | grep "[.]bam$" | split -l $BATCH_SIZE -d - file-lists-for-rmdup/
 
 ls file-lists-for-rmdup | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/rmdup-and-make-split-bed.sh    \
+    qsub $SCRIPTS_DIR/rmdup-and-make-split-bed.sh    \
         $WORKING_DIR/aligned-reads-filtered-sorted                  \
         $WORKING_DIR/file-lists-for-rmdup/$BATCH                    \
         $SCRIPTS_DIR/                                               \
@@ -328,7 +326,7 @@ mkdir unique-read-to-gene-assignments
 ls aligned-reads-rmdup-split-bed/ | grep "[.]bed$" | split -l $BATCH_SIZE -d - file-lists-for-assign-reads-to-genes/
 
 ls file-lists-for-assign-reads-to-genes | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/assign-reads-to-genes.sh       \
+    qsub $SCRIPTS_DIR/assign-reads-to-genes.sh       \
         $WORKING_DIR/aligned-reads-rmdup-split-bed                  \
         $WORKING_DIR/file-lists-for-assign-reads-to-genes/$BATCH    \
         $GENE_MODEL_DIR/latest.exons.bed                            \
@@ -353,7 +351,7 @@ done \
 | split -l $BATCH_SIZE -d - file-lists-for-UMI-counting/
 
 ls file-lists-for-UMI-counting | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/count-UMI-per-sample.sh    \
+    qsub $SCRIPTS_DIR/count-UMI-per-sample.sh    \
         $WORKING_DIR/aligned-reads-filtered-sorted              \
         $WORKING_DIR/aligned-reads-rmdup-split-bed              \
         $WORKING_DIR/file-lists-for-UMI-counting/$BATCH         \
@@ -448,7 +446,7 @@ mkdir UMI-count-rollup
 ls unique-read-to-gene-assignments/ | split -l $BATCH_SIZE -d - file-lists-for-UMI-count-rollup/
 
 ls file-lists-for-UMI-count-rollup | while read BATCH; do
-    qsub -P trapnelllab $SCRIPTS_DIR/UMI-count-rollup.sh        \
+    qsub $SCRIPTS_DIR/UMI-count-rollup.sh        \
         $WORKING_DIR/unique-read-to-gene-assignments            \
         $WORKING_DIR/file-lists-for-UMI-count-rollup/$BATCH     \
         $WORKING_DIR/UMI-count-rollup
