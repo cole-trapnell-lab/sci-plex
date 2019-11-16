@@ -1,11 +1,8 @@
+# devtools::install_github(repo = 'cole-trapnell-lab/monocle3', ref = "d4a9a35")
+# Specific commit used in performing all analyses
 
-
-
-# Input path to github directory
 path_to_github = "~/sci-Plex/"
-path_to_monocle3 = paste0(path_to_github,
-                          "monocle3_d4a9a35/monocle3/",
-                          sep = "")
+
 suppressPackageStartupMessages({
   library(dplyr)
   library(ggplot2)
@@ -14,8 +11,7 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(parallel)
   library(ggridges)
-  library(devtools)
-  load_all(path_to_monocle3)
+  library(monocle3)
 })
 
 
