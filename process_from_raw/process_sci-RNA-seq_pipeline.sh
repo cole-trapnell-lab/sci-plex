@@ -7,47 +7,62 @@
 
 #
 # Change this to a directory that you own
+# This directory will contain all the outputs of the pipeline
 #
 
-WORKING_DIR=`pwd`
-cd $WORKING_DIR
+WORKING_DIR=
+
+
+#
+# Change this directory to the local copy of the cloned github repo
+# https://github.com/cole-trapnell-lab/sci-plex
+#
+
+PATH_TO_GIT_REPO = 
+
+ 
+# Download GNU Datamash
+# https://www.gnu.org/software/datamash/
+DATAMASH_PATH=
+
+
 
 #
 # You don't need to change these paths
 #
 
-SCRIPTS_DIR=/net/trapnell/vol1/jspacker/sci-RNA-seq-pipeline-scripts
+
+SCRIPTS_DIR=$PATH_TO_GIT_REPO/process_from_raw/sci-RNA-seq-pipeline-scripts
+
 SANJAY_SCRIPTS_DIR=/net/trapnell/vol1/home/sanjays/projects/Chem/bin
-DATAMASH_PATH=/net/trapnell/vol1/jspacker/datamash/datamash
+
+# Hash sample Sheets can be found associated with each experiment
 HASH_BARCODES_FILE=$WORKING_DIR/hashSampleSheet.txt
+
 #
 # STAR_INDEX is the path to the STAR genome index you want to align reads with.
 # 
-# For new projects, use one of the following indices:
-#
-# STAR_INDEX=/net/trapnell/vol1/jspacker/STAR/human-and-mouse/GRCh38-GRCm38-primary-assembly
-# STAR_INDEX=/net/trapnell/vol1/jspacker/STAR/human/GRCh38-primary-assembly
- STAR_INDEX=/net/trapnell/vol1/jspacker/STAR/mouse/GRCm38-primary-assembly
-# STAR_INDEX=/net/trapnell/vol1/jspacker/STAR/c-elegans/WS260
-# STAR_INDEX=/net/trapnell/vol1/tenx_software/refdata-cellranger-latest/zg11-3p-utr-extended-500-bp-plus-mCherry/star
 
-# STAR_INDEX=/net/trapnell/vol1/jspacker/STAR/human-and-mouse/GRCh38-GRCm38-primary-assembly
+# Create star indices for human and mouse genomes together (barnyard)
+# and for the human genome by itself 
 
-#
+# Used for the Barnyard Experiemnt in figure 1 
+# STAR_INDEX=STAR/human-and-mouse/GRCh38-GRCm38-primary-assembly
+
+# Used for the mapping of all other data
+# STAR_INDEX=STAR/human/GRCh38-primary-assembly
+
+
 # GENE_MODEL_DIR is a directory with BED files for various genomic features
 # that are used to assign aligned reads to genes.
-#
-# For new projects, use one of the following gene model directories
-# these directories contain information from
-# GENCODE v27 (human), GENCODE vM15 (mouse), and WS260 (C. elegans)
-#
-# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/human-and-mouse/
-# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/human/
- GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/mouse/
-# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/c-elegans/
-# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/zebrafish-GRCz11-Ensembl-93-3p-UTR-extended-500-bp-plus-mCherry/
 
-#
+# Used for the Barnyard Experiemnt in figure 1 
+# GENE_MODEL_DIR=/net/trapnell/vol1/jspacker/gene-models/human-and-mouse/
+
+# Used as the gene moedel of all other data
+GENE_MODEL_DIR=$PATH_TO_GIT_REPO/process_from_raw/gene-models/human/
+
+
 # RT_BARCODES_FILE is a two column tab-delimited file where
 # column 1 = well id
 # column 2 = RT barcode
@@ -69,9 +84,16 @@ HASH_BARCODES_FILE=$WORKING_DIR/hashSampleSheet.txt
 # RT_BARCODES_FILE=/net/trapnell/vol1/home/sanjays/projects/Chem/bin/RT_indices_all
 #
 
-RT_BARCODES_FILE=$SANJAY_SCRIPTS_DIR/RT_indices_all
 
-#
+# 2 level sci-RNA-seq RT barcodes
+RT_BARCODES_FILE=$SCRIPTS_DIR/RT_indices_all
+
+# 3 level sci-RNA-seq RT barcodes
+# RT_BARCODES_FILE=$SCRIPTS_DIR/RT_384_3lvl
+# LIG_BARCODES_FILE=$SCRIPTS_DIR/ligation_384_3lvl
+
+
+
 # If you have only one biological sample,
 # just write the sample name to a file called combinatorial.indexing.key
 #
@@ -82,7 +104,7 @@ RT_BARCODES_FILE=$SANJAY_SCRIPTS_DIR/RT_indices_all
 # just contact me (Jonathan Packer, on slack or at jspacker@uw.edu).
 #
 
-SAMPLE_NAME="space68"
+SAMPLE_NAME="sciPlex"
 
 echo "$SAMPLE_NAME" >$WORKING_DIR/combinatorial.indexing.key
 
@@ -96,10 +118,11 @@ echo "$SAMPLE_NAME" >$WORKING_DIR/combinatorial.indexing.key
 # uses 10 GB per qsub, or 240 GB total for 96 PCR wells and BATCH_SIZE=4
 #
 
-BATCH_SIZE=4
+BATCH_SIZE=1
 
 #-------------------------------------------------------------------------------
 # Put read 1 info (RT well, UMI) into read 2 read name
+# 2 Level sci-RNA Seq Specific
 #-------------------------------------------------------------------------------
 
 cd $WORKING_DIR
@@ -121,6 +144,33 @@ ls file-lists-for-r1-info-munging | while read BATCH; do
         $WORKING_DIR/put-r1-info-in-r2-logs
 done
 
+
+#-------------------------------------------------------------------------------
+# Put read 1 info (RT well, UMI) into read 2 read name
+# 3 Level sci-RNA Seq Specific Chunk of code
+#-------------------------------------------------------------------------------
+
+# 
+# cd $WORKING_DIR
+# 
+# mkdir combined-fastq
+# mkdir file-lists-for-r1-info-munging
+# mkdir put-r1-info-in-r2-logs
+# 
+# ls fastq/ | grep _R1_ | grep -v Undetermined | split -l $BATCH_SIZE -d - file-lists-for-r1-info-munging/
+#   
+# ls file-lists-for-r1-info-munging | while read BATCH; do
+#   qsub -P trapnelllab $SCRIPTS_DIR/put-read1-info-in-read2_3Level.sh \
+#       $WORKING_DIR/fastq                                      \
+#       $WORKING_DIR/file-lists-for-r1-info-munging/$BATCH      \
+#       $SCRIPTS_DIR/                                           \
+#       $RT_BARCODES_FILE                                       \
+#       $LIG_BARCODES_FILE                                      \
+#       $WORKING_DIR/combinatorial.indexing.key                 \
+#       $WORKING_DIR/combined-fastq                             \
+#       $WORKING_DIR/put-r1-info-in-r2-logs
+#   done
+
 #-------------------------------------------------------------------------------
 # Parse Hash Barcodes
 #-------------------------------------------------------------------------------
@@ -134,10 +184,10 @@ mkdir hashed-logs
 ls combined-fastq/ | split -l $BATCH_SIZE -d - file-lists-for-trimming/
 
 ls file-lists-for-r1-info-munging | while read BATCH; do
-    qsub -P trapnelllab $SANJAY_SCRIPTS_DIR/parse_hash.sh \
+    qsub -P trapnelllab $SCRIPTS_DIR/parse_hash.sh \
         $WORKING_DIR/combined-fastq                             \
         $WORKING_DIR/file-lists-for-trimming/$BATCH             \
-        $SANJAY_SCRIPTS_DIR/                                    \
+        $SCRIPTS_DIR/                                           \
         $HASH_BARCODES_FILE                                     \
         $WORKING_DIR/combinatorial.indexing.key                 \
         $WORKING_DIR/hashed-fastq                               \
@@ -166,7 +216,7 @@ zcat hashed-fastq/*.gz \
     > $WORKING_DIR/hashUMIs.per.cell
 
 
-Rscript $SANJAY_SCRIPTS_DIR/knee-plot.R            \
+Rscript $SCRIPTS_DIR/knee-plot.R            \
     $WORKING_DIR/hashUMIs.per.cell          \
     $WORKING_DIR/hashed-logs
 
@@ -202,6 +252,8 @@ done
 
 #-------------------------------------------------------------------------------
 # Align reads using STAR
+# Need to download STAR index
+# Not included in github repository
 #-------------------------------------------------------------------------------
 
 cd $WORKING_DIR
@@ -342,11 +394,11 @@ cd $WORKING_DIR
 
 module load modules modules-init modules-gs
 module load pypy/3.5.6.0
-source /net/trapnell/vol1/home/sanjays/bin/sciRNAseq/pipeline_scripts/pypy_env/bin/activate
+source $SCRIPTS_DIR/bin/activate
 
 START_TIME=$SECONDS
 cat unique-read-to-gene-assignments/* \
-    | pypy  $SANJAY_SCRIPTS_DIR/count_UMIs.py --cell - \
+    | pypy  $SCRIPTS_DIR/count_UMIs.py --cell - \
     > UMIs.per.cell.barcode
 ELAPSED_TIME=$(($SECONDS - $START_TIME))
 echo "Processed $FILE in $ELAPSED_TIME seconds"
@@ -354,7 +406,7 @@ echo "Processed $FILE in $ELAPSED_TIME seconds"
 
 mkdir final-output/knee-plots
 
-Rscript $SANJAY_SCRIPTS_DIR/knee-plot.R            \
+Rscript $SCRIPTS_DIR/knee-plot.R            \
     UMIs.per.cell.barcode                   \
     $WORKING_DIR/final-output/knee-plots
 
@@ -373,9 +425,9 @@ cd final-output && tar czf ../knee-plots.tar.gz knee-plots/ && cd ..
 #
 cd $WORKING_DIR
 
-UMI_PER_CELL_CUTOFF=300
+UMI_PER_CELL_CUTOFF=500
 
-Rscript $SANJAY_SCRIPTS_DIR/knee-plot.R     \
+Rscript $SCRIPTS_DIR/knee-plot.R     \
     UMIs.per.cell.barcode                   \
     $WORKING_DIR/final-output/knee-plots    \
     $UMI_PER_CELL_CUTOFF
@@ -451,7 +503,7 @@ gunzip <prelim.UMI.count.rollup.gz \
 >final-output/UMI.count.matrix
 
 
-Rscript ~/bin/monocle3_scripts/makeCDS_monocle3.R \
+Rscript ~#SCRIPTS_DIR/makeCDS.R \
         $WORKING_DIR/final-output/UMI.count.matrix \
         $WORKING_DIR/final-output/gene.annotations \
         $WORKING_DIR/final-output/cell.annotations \
@@ -480,7 +532,7 @@ awk '($3 > CUTOFF_LOW) && ($3 < CUTOFF_HIGH) { print $2}
     > $WORKING_DIR/hashRDS/intermediate.cells.csv
 
 
-Rscript $SANJAY_SCRIPTS_DIR/chiSq_2lvl.R                    \
+Rscript $SCRIPTS_DIR/chiSq_2lvl.R                           \
         $WORKING_DIR/hashRDS/background.cells.csv           \
         $WORKING_DIR/hashRDS/real.cells.csv                 \
         $WORKING_DIR/hashed-fastq/                          \
@@ -491,66 +543,4 @@ Rscript $SANJAY_SCRIPTS_DIR/chiSq_2lvl.R                    \
 
 #-------------------------------------------------------------------------------
 
-
-#
-# This is the end of the pipeline.
-# The data is now ready to load into R as a Monocle CellDataSet.
-#
-# Here is an R function to do that.
-# Now would also be a good time to check that you are using the latest version of Monocle.
-# As of December 2017, that is Monocle version 2.6.1.
-#
-# Also make sure to get irlba version 2.3.2 from Github (version 2.3.1 is buggy).
-# devtools::install_github("bwlewis/irlba", ref = "9dab7ed2152c42e5c99a3b01e1ac33ba47e3a909")
-#
-
-load.cds = function(mat.path, gene.annotation.path, cell.annotation.path) {
-    df = read.table(
-        mat.path,
-        col.names = c("gene.idx", "cell.idx", "count"),
-        colClasses = c("integer", "integer", "integer"))
-    
-    gene.annotations = read.table(
-        gene.annotation.path,
-        col.names = c("id", "gene_short_name"),
-        colClasses = c("character", "character"))
-    
-    cell.annotations = read.table(
-        cell.annotation.path,
-        col.names = c("cell", "sample"),
-        colClasses = c("character", "factor"))
-    
-    rownames(gene.annotations) = gene.annotations$id
-    rownames(cell.annotations) = cell.annotations$cell
-    
-    # add a dummy cell to ensure that all genes are included in the matrix
-    # even if a gene isn't expressed in any cell
-    df = rbind(df, data.frame(
-        gene.idx = c(1, nrow(gene.annotations)),
-        cell.idx = rep(nrow(cell.annotations)+1, 2),
-        count = c(1, 1)))
-    
-    mat = sparseMatrix(i = df$gene.idx, j = df$cell.idx, x = df$count)
-    mat = mat[, 1:(ncol(mat)-1)]
-    
-    rownames(mat) = gene.annotations$id
-    colnames(mat) = cell.annotations$cell
-    
-    pd = new("AnnotatedDataFrame", data = cell.annotations)
-    fd = new("AnnotatedDataFrame", data = gene.annotations)
-
-    cds = newCellDataSet(mat, phenoData = pd, featureData = fd, expressionFamily = negbinomial.size())
-    pData(cds)$n.umi = apply(exprs(cds), 2, sum)
-
-    return(cds)
-}
-
-#
-# Example usage:
-#
-
-cds = load.cds(
-    "final-output/UMI.count.matrix",
-    "final-output/gene.annotations",
-    "final-output/cell.annotations")
 
