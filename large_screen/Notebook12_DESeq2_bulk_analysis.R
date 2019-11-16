@@ -2,9 +2,6 @@
 
 # Input path to github directory
 path_to_github = "~/sci-Plex/"
-path_to_monocle3 = paste0(path_to_github,
-                          "monocle3_d4a9a35/monocle3/",
-                          sep = "")
 
 # Set directory for sciPlex bin
 bin_directory = paste0(path_to_github,
@@ -22,9 +19,8 @@ suppressPackageStartupMessages({
   library(snowfall)
   library(DESeq2)
   library(ggpubr)
-  library(devtools)
   library(piano)
-  load_all(path_to_monocle3)
+  library(monocle3)
 })
 
 # Set DelayedArray Parameters

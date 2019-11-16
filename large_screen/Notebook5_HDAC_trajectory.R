@@ -2,9 +2,6 @@
 
 # Input path to github directory
 path_to_github = "~/sci-Plex/"
-path_to_monocle3 = paste0(path_to_github,
-                          "monocle3_d4a9a35/monocle3/",
-                          sep = "")
 
 # Set directory for sciPlex bin
 bin_directory = paste0(path_to_github,
@@ -21,8 +18,7 @@ suppressPackageStartupMessages({
   library(tidymodels)
   library(snowfall)
   library(UpSetR)
-  library(devtools)
-  load_all(path_to_monocle3)
+  library(monocle3)
   source(paste0(bin_directory,
                 "cell_cycle.R",
                 sep = ""))
@@ -205,10 +201,12 @@ root_nodes =
 root_nodes = root_nodes$closest_vertex
 
 pData(cds)$root_node = pData(cds)$closest_vertex %in% root_nodes
+
 root_cells  = 
   colData(cds) %>% 
   as.data.frame() %>% 
-  filter(root_node) %>% pull(cell) %>% 
+  filter(root_node) %>% 
+  pull(cell) %>% 
   as.character()
 
 cds <- order_cells(cds, root_cells=root_cells)

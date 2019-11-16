@@ -1,10 +1,8 @@
 # devtools::install_github(repo = 'cole-trapnell-lab/monocle3', ref = "d4a9a35")
+# Specific commit used in performing all analyses
 
 # Input path to github directory
 path_to_github = "~/sci-Plex/"
-path_to_monocle3 = paste0(path_to_github,
-                          "monocle3_d4a9a35/monocle3/",
-                          sep = "")
 
 # Set directory for sciPlex github 
 bin_directory = paste0(path_to_github,
@@ -13,8 +11,7 @@ bin_directory = paste0(path_to_github,
 
 suppressPackageStartupMessages({
   library(dplyr)
-  library(devtools)
-  load_all(path_to_monocle3)
+  library(monocle3)
 })
 
 

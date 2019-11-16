@@ -2,9 +2,6 @@
 
 # Input path to github directory
 path_to_github = "~/sci-Plex/"
-path_to_monocle3 = paste0(path_to_github,
-                          "monocle3_d4a9a35/monocle3/",
-                          sep = "")
 
 # Set directory for sciPlex bin
 bin_directory = paste0(path_to_github,
@@ -12,7 +9,6 @@ bin_directory = paste0(path_to_github,
                        sep = "")
 
 suppressPackageStartupMessages({
-  library(devtools)
   library(ggplot2)
   library(reshape2)
   library(viridis)
@@ -24,7 +20,7 @@ suppressPackageStartupMessages({
   library(drc)
   library(piano)
   library(snowfall)
-  load_all(path_to_monocle3)
+  library(monocle3)
   source(paste0(bin_directory,
                 "cell_cycle.R",
                 sep = ""))
