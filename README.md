@@ -1,5 +1,7 @@
 # Sci-Plex
+
 ###Introduction
+
 [Sci-Plex] (https://science.sciencemag.org/content/early/2019/12/04/science.aax6234
 ) is a labeling sampling that enables sample labeling within sci-RNA-seq. This github repository documents processing pipelines, primary and secondary analyses, and other files used in the generation, analysis and interpretation of the data. 
 
