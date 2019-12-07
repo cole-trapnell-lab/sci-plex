@@ -1,7 +1,7 @@
 # Sci-Plex
 
 
-[Sci-Plex] (https://science.sciencemag.org/content/early/2019/12/04/science.aax6234
+[Sci-Plex](https://science.sciencemag.org/content/early/2019/12/04/science.aax6234
 ) is a labeling sampling that enables sample labeling within sci-RNA-seq. This github repository documents processing pipelines, primary and secondary analyses, and other files used in the generation, analysis and interpretation of the data. 
 
 ### Contents
@@ -20,6 +20,6 @@ The scripts and code used to process the data can be accessed within the [proces
 
 ##### Ordering Reagents for Hashing
 
-As highlighted by the paper, oligo-hashing is an simple procedure employing off the shelf reagents. To make this more accessible we have included  96-well format IDT order forms for the hash-oligo sequences used in this study. These excel files can be found in the [reagents] (https://github.com/cole-trapnell-lab/sci-plex/tree/master/reagents/IDT_hash_oligo_order_forms) folder in this github repository. A single plate of 40nmols of hash-oligos from IDT should be sufficient for up to 800 labeling reactions per well. 
+As highlighted by the paper, oligo-hashing is an simple procedure employing off the shelf reagents. To make this more accessible we have included  96-well format IDT order forms for the hash-oligo sequences used in this study. These excel files can be found in the [reagents](https://github.com/cole-trapnell-lab/sci-plex/tree/master/reagents/IDT_hash_oligo_order_forms) folder in this github repository. A single plate of 40nmols of hash-oligos from IDT should be sufficient for up to 800 labeling reactions per well. 
 
 We are currently working on a protocols.io page for both [sci-RNA-seq](https://science.sciencemag.org/content/357/6352/661) and [sci-plex](https://science.sciencemag.org/content/early/2019/12/04/science.aax6234). As soon as this is ready we will update with a link here and advertise it more broadly. 
